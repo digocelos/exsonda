@@ -30,5 +30,6 @@ defmodule Exsonda.Parser do
   defp parser_line(line) do
     line
     |> String.trim()
+    |> String.split(" ")
   end
 end
