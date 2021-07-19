@@ -1,4 +1,18 @@
 defmodule Exsonda.Parser do
+  @moduledoc """
+  Módulo responsável por efetuar a leitura e validação inicial do arquivo
+
+  Exemplos:
+  iex> Exsonda.Parser.call(filename)
+  {:ok, stream}
+
+  iex> Exsonda.Parser.call(arquivo_inexistente)
+  {:error, "Invalid file"}
+  """
+
+  @doc """
+  Função de chamada para efetuar a leitura do arquivo com os dados de sondas
+  """
   def call(filename) do
     case File.exists?(filename) do
       false -> {:error, "Invalid file"}
