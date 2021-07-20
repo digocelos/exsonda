@@ -1,11 +1,25 @@
 defmodule Exsonda.Decoder do
   @moduledoc """
+  Módulo responsável por decodificar arquivos parseado e converter em
+  um map simples para o processamento de movimentos das sondas.
 
+  Exemplo:
+  iex> {:ok, params} = Exsonda.Parser.call("command_files") |> Exsonda.Decoder.call()
+  {:ok,
+    %{
+      "coord" => ["5", "5"],
+      "sondas" => [
+        ok: %{"command" => "LMLMLMLMM", "dir" => "N", "x" => "1", "y" => "2"},
+        ok: %{"command" => "MMRMMRMRRM", "dir" => "E", "x" => "3", "y" => "3"}
+      ]
+    }
+  }
   """
   import Exsonda.Validate
 
   alias Exsonda.Helpers.Builder
 
+  # Direções aceitas na posição inicial
   @valid_directions [
     "N",
     "S",
@@ -13,7 +27,7 @@ defmodule Exsonda.Decoder do
     "W"
   ]
 
-  def call({:error, reason}), do: {:error, reason}
+  def call({:error, reason}), do: Builder.build_error(reason)
 
   def call({:ok, stream}) do
     stream
@@ -37,6 +51,8 @@ defmodule Exsonda.Decoder do
     Builder.build_decoder(coords, new_sondas)
   end
 
+  defp decode_sondas({:error, reason}), do: Builder.build_error(reason)
+
   defp decode_sonda([[x, y, dir], [command]])
        when is_integer(x)
        when is_integer(y)
@@ -49,7 +65,8 @@ defmodule Exsonda.Decoder do
 
   defp decode_sonda(_), do: Builder.build_error("Invalid sonda coord")
 
-  defp build_sonda({:ok, command}, x, y, dir), do: Builder.build_decoder_sonda(x, y, dir, command)
+  defp build_sonda({:ok, command}, x, y, dir),
+    do: Builder.build_decoder_sonda(x, y, dir, command)
 
   defp build_sonda({:error, reason}, _x, _y, _dir), do: Builder.build_error(reason)
 end
