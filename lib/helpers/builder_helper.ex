@@ -1,4 +1,4 @@
-defmodule Exsonda.Util do
+defmodule Exsonda.Helpers.Builder do
   @moduledoc """
   Módulo com funções uteis para criação de retornos para coordenadas e sondas
   """
@@ -21,4 +21,13 @@ defmodule Exsonda.Util do
   """
   def build_decoder_sonda(x, y, dir, command),
     do: {:ok, %{"x" => x, "y" => y, "dir" => dir, "command" => command}}
+
+  @doc """
+  Mótodo construtor de erro padrão
+
+  Exemplo:
+  iex>Exsonda.Helpers.Builder.build_error("teste")
+  {:error, "teste"}
+  """
+  def build_error(reason), do: {:error, reason}
 end

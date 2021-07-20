@@ -10,12 +10,14 @@ defmodule Exsonda.Parser do
   {:error, "Invalid file"}
   """
 
+  alias Exsonda.Helpers.Builder
+
   @doc """
   Função de chamada para efetuar a leitura do arquivo com os dados de sondas
   """
   def call(filename) do
     case File.exists?(filename) do
-      false -> {:error, "Invalid file"}
+      false -> Builder.build_error("Invalid file")
       true -> parser_file(filename)
     end
   end
