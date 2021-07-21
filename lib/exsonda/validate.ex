@@ -3,7 +3,7 @@ defmodule Exsonda.Validate do
   Módulo com funções para validações de coordenadas de sonda ou validações de comandos
   das sondas.
   """
-  alias Exsonda.Helpers.Builder
+  alias Exsonda.Helper
 
   @doc """
   Método utilizado para validação das coordenadas inciais de uma sonda
@@ -21,9 +21,9 @@ defmodule Exsonda.Validate do
       when tuple_size(coord) == 2
       when is_number(x)
       when is_number(y),
-      do: Builder.build_decoder(coord, sondas)
+      do: Helper.build_decoder(coord, sondas)
 
-  def validate_coord(_coord), do: Builder.build_error("Invalid coord")
+  def validate_coord(_coord), do: Helper.build_error("Invalid coord")
 
   @doc """
   Método utilizado para validar se os comandos de movimentação de uma determinada sonda,
@@ -39,7 +39,7 @@ defmodule Exsonda.Validate do
   def validate_command(command) do
     case Regex.match?(~r/^[MLR]+$/i, command) do
       false ->
-        Builder.build_error("Invalid command (#{command})")
+        Helper.build_error("Invalid command (#{command})")
 
       true ->
         {:ok, command}

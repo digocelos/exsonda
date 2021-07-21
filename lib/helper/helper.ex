@@ -1,7 +1,9 @@
-defmodule Exsonda.Helpers.Builder do
+defmodule Exsonda.Helper do
   @moduledoc """
   Módulo com funções uteis para criação de retornos para coordenadas e sondas
   """
+
+  def build_coordenadas(plataforma, sondas), do: %{"plataforma" => plataforma, "sondas" => sondas}
 
   @doc """
   Método que monta retorno positivo de coordenadas e sondas
