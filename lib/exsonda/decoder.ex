@@ -4,69 +4,76 @@ defmodule Exsonda.Decoder do
   um map simples para o processamento de movimentos das sondas.
 
   Exemplo:
-  iex> {:ok, params} = Exsonda.Parser.call("command_files") |> Exsonda.Decoder.call()
+  iex> {:ok, coordenadas} = Exsonda.Decoder.call("arquivo_com_comandos")
   {:ok,
-    %{
-      "coord" => ["5", "5"],
-      "sondas" => [
-        ok: %{"command" => "LMLMLMLMM", "dir" => "N", "x" => "1", "y" => "2"},
-        ok: %{"command" => "MMRMMRMRRM", "dir" => "E", "x" => "3", "y" => "3"}
-      ]
-    }
-  }
+  %{
+    "plataforma" => %{x: "5", y: "5"},
+    "sondas" => [
+      %{"comandos" => "LMLMLMLMM", "dir" => "N", "x" => "1", "y" => "2"},
+      %{"comandos" => "MMRMMRMRRM", "dir" => "E", "x" => "3", "y" => "3"}
+    ]
+  }}
   """
-  import Exsonda.Validate
+  import Exsonda.Validation
 
   alias Exsonda.Helper
 
-  # Direções aceitas na posição inicial
-  @valid_directions [
-    "N",
-    "S",
-    "E",
-    "W"
-  ]
+  def call(stream) do
+    result =
+      stream
+      |> Enum.map(& &1)
+      |> decodifica_coordenadas_plataforma()
+      |> decodifica_coordenadas_sondas()
 
-  def call({:error, reason}), do: Helper.build_error(reason)
-
-  def call({:ok, stream}) do
-    stream
-    |> Enum.map(& &1)
-    |> decode_coord()
-    |> validate_coord()
-    |> decode_sondas()
+    case result do
+      {:error, _reason} = e -> e
+      coordenadas -> {:ok, coordenadas}
+    end
   end
 
-  defp decode_coord(data) when is_list(data) do
+  defp decodifica_coordenadas_plataforma(data) when is_list(data) do
     [coord | sondas] = data
-    Helper.build_decoder(coord, sondas)
+
+    case valida_coordenadas_plataforma(coord) do
+      {:error, reason} ->
+        {:error, reason}
+
+      :ok ->
+        [x, y] = coord
+        Helper.build_coordenadas(%{x: x, y: y}, sondas)
+    end
   end
 
-  defp decode_sondas({:ok, %{"coord" => coords, "sondas" => sondas}}) do
+  defp decodifica_coordenadas_sondas(%{"plataforma" => plataforma, "sondas" => sondas}) do
     new_sondas =
       sondas
       |> Enum.chunk_every(2)
-      |> Enum.map(&decode_sonda(&1))
+      |> Enum.map(&decodifica_sonda(&1))
 
-    Helper.build_decoder(coords, new_sondas)
+    Helper.build_coordenadas(plataforma, new_sondas)
   end
 
-  defp decode_sondas({:error, reason}), do: Helper.build_error(reason)
+  defp decodifica_coordenadas_sondas(error), do: error
 
-  defp decode_sonda([[x, y, dir], [command]])
+  defp decodifica_sonda([[x, y, dir], [comandos]])
        when is_integer(x)
        when is_integer(y)
-       when dir in @valid_directions
-       when is_bitstring(command) do
-    command
-    |> validate_command()
-    |> build_sonda(x, y, dir)
+       when is_bitstring(comandos) do
+    case valida_direcao_sonda(dir) do
+      {:error, reason} ->
+        {:error, reason}
+
+      :ok ->
+        comandos
+        |> valida_comando()
+        |> build_sonda(x, y, dir)
+    end
   end
 
-  defp decode_sonda(_), do: Helper.build_error("Invalid sonda coord")
+  defp decodifica_sonda(_), do: {:error, "Dados invalidos para esta sonda"}
 
-  defp build_sonda({:ok, command}, x, y, dir),
-    do: Helper.build_decoder_sonda(x, y, dir, command)
+  defp build_sonda({:ok, comandos}, x, y, dir),
+    do: Helper.build_coordenadas_sonda(x, y, dir, comandos)
 
-  defp build_sonda({:error, reason}, _x, _y, _dir), do: Helper.build_error(reason)
+  defp build_sonda(error, _x, _y, _dir), do: error
 end

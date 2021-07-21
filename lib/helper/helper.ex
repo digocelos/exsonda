@@ -5,6 +5,9 @@ defmodule Exsonda.Helper do
 
   def build_coordenadas(plataforma, sondas), do: %{"plataforma" => plataforma, "sondas" => sondas}
 
+  def build_coordenadas_sonda(x, y, dir, comandos),
+    do: %{"x" => x, "y" => y, "dir" => dir, "comandos" => comandos}
+
   @doc """
   Método que monta retorno positivo de coordenadas e sondas
 
@@ -12,7 +15,7 @@ defmodule Exsonda.Helper do
   iex> Exsonda.Util.build_decoder([5, 5], [{}])
   {:ok, %{"coord" => [5, 5], "sondas" => [{}]}}
   """
-  def build_decoder(coord, sondas), do: {:ok, %{"coord" => coord, "sondas" => sondas}}
+  def build_decoder(coord, sondas), do: {:ok, %{"plataforma" => coord, "sondas" => sondas}}
 
   @doc """
   Método que monta retorno positivo de sonda

@@ -1,21 +1,22 @@
 # Exsonda
 
-**TODO: Add description**
+**Simulação de pouso em marte**
 
-## Installation
+Um conjunto de sondas foi enviado pela NASA à Marte e irá pousar num planalto. Esse planalto, que curiosamente é retangular, deve ser explorado pelas sondas para que suas câmeras embutidas consigam ter uma visão completa da área e enviar as imagens de volta para a Terra.
+A posição e direção de uma sonda são representadas por uma combinação de coordenadas x-y e uma letra representando a direção cardinal para qual a sonda aponta, seguindo a rosa dos ventos em inglês.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `exsonda` to your list of dependencies in `mix.exs`:
+## Execução
+
+Para testar a aplicação rode o comando em seu prompt
 
 ```elixir
-def deps do
-  [
-    {:exsonda, "~> 0.1.0"}
-  ]
-end
+mix exsonda.init "arquivo_com_instrucoes_de_voo"
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/exsonda](https://hexdocs.pm/exsonda).
+## Testes
 
+Para execução dos testes basta rodar
+
+```elixir
+mix test
+```
